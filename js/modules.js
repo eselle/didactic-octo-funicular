@@ -1,3 +1,44 @@
+CORE.create_module("search-box", function (sb) {
+    var searchInput, searchButton, resetButton;
+    
+    return {
+        init: function () {
+            searchInput = sb.find("#search_input")[0];
+            searchButton = sb.find("#search_button")[0];
+            resetButton = sb.find("#quit_search")[0];
+            
+            sb.addEvent(searchButton, "click", this.search);
+            sb.addEvent(resetButton, "click", this.reset);
+        },
+        destroy: function () {
+            sb.removeEvent(searchButton, "click", this.search);
+            sb.removeEvent(resetButton, "click", this.reset);
+            
+            searchInput = null;
+            searchButton = null;
+            resetButton = null;
+        },
+        search: function () {
+            var query = searchInput.value;
+            
+            if (query) {
+                // this will trigger an event that the product-panel is listening to
+                sb.notify({
+                    type : 'perform-search',
+                    data : query
+                });
+            }
+        },
+        reset: function () {
+            searchInput.value = "";
+            
+            sb.notify({
+                type : 'quit-search'
+            });
+        }
+    };
+});
+
 CORE.create_module("filters-bar", function (sb) {
     var filters;
 
@@ -28,6 +69,7 @@ CORE.create_module("product-panel", function (sb) {
             fn(product);
         }
     }
+    
     function reset () {
         eachProduct(function (product) {
             product.style.opacity = '1';
@@ -38,7 +80,8 @@ CORE.create_module("product-panel", function (sb) {
         init : function () {
             var that = this;
 
-            products = sb.find("li");
+            this.getProducts();
+
             sb.listen({
                 'change-filter' : this.change_filter,
                 'reset-filter'  : this.reset,
@@ -56,6 +99,25 @@ CORE.create_module("product-panel", function (sb) {
             });
             sb.ignore(['change-filter', 'reset-filter', 'perform-search', 'quit-search']);
         },
+        getProducts: function () {
+            var serverProducts;
+            
+            sb.login('moravia', 'argentina', function(response) {
+                
+                sb.getData(function (response) {
+                    if(response.length) {
+                        serverProducts = response;
+                    };
+                })
+            });
+            
+            
+            products = sb.find("li");
+            
+        },
+        createProducts: function (serverProducts) {
+            console.log(serverProducts);
+        },
         reset : reset,
         change_filter : function (filter) {
             reset();
@@ -67,7 +129,7 @@ CORE.create_module("product-panel", function (sb) {
         },
         search : function (query) {
             reset();
-           query = query.toLowerCase();
+            query = query.toLowerCase();
             eachProduct(function (product) {
                 if (product.getElementsByTagName('p')[0].innerHTML.toLowerCase().indexOf(query) < 0) {
                     product.style.opacity = '0.2';

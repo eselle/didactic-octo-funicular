@@ -142,6 +142,24 @@ var CORE = (function () {
         },
         is_obj : function (obj) {
             return jQuery.isPlainObject(obj);         
+        },
+        post: function (url, data, callback) {
+            return jQuery.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                success: callback,
+                error: callback
+            });
+        },
+        get: function (url, authToken, callback) {
+            return jQuery.ajax({
+                beforeSend: function(xhr){xhr.setRequestHeader('token', authToken);},
+                type: 'GET',
+                url: url,
+                success: callback,
+                error: callback
+            });
         }
     };
 

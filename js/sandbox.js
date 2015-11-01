@@ -1,6 +1,9 @@
 var Sandbox =  {
     create : function (core, module_selector) {
         var CONTAINER = core.dom.query('#' + module_selector);
+        var baseUrl = 'http://localhost:3000';
+        var authToken = '';
+
         return {
             find : function (selector) {
                 return CONTAINER.query(selector);
@@ -46,6 +49,24 @@ var Sandbox =  {
                     core.dom.apply_attrs(el, config);
                 }
                 return el;
+            },
+            login: function (username, password, callback) {
+                return core.post(
+                    baseUrl + '/auth.json',
+                    {username: username, password: password},
+                    function (response) {
+                        authToken = response.token;
+                    
+                        return callback(response);
+                    }
+                );
+            },
+            getData: function (callback) {
+                return core.get(
+                    baseUrl + '/products.json',
+                    authToken,
+                    callback
+                )
             }
         };
     }
