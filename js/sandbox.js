@@ -54,17 +54,21 @@ var Sandbox =  {
                 return core.post(
                     baseUrl + '/auth.json',
                     {username: username, password: password},
-                    function (response) {
-                        authToken = response.token;
+                    function (response, status) {
+                        if (status === 'success') {
+                            sessionStorage.token = response.token;
+                        } else {
+                            delete sessionStorage.token;
+                        };
                     
-                        return callback(response);
+                        return callback(response, status);
                     }
                 );
             },
             getData: function (callback) {
                 return core.get(
                     baseUrl + '/products.json',
-                    authToken,
+                    sessionStorage.token,
                     callback
                 )
             }

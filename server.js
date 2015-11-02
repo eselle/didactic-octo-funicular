@@ -1,6 +1,8 @@
 var express = require('express'),
-    app = express();
+    app = express()
+
 app.use(express.bodyParser());
+app.use(express.static(__dirname));
 
 var PRODUCTS = [
     {"id":"1", "keyword":"red", "file":"img/1.jpg", "name":"First Item"},
@@ -16,6 +18,15 @@ var PRODUCTS = [
 ];
 
 var currentToken;
+
+app.get('/', function(req, res) {
+    res.sendfile(__dirname + '/index.html')
+});
+
+app.get('/login', function(req, res) {
+    res.sendfile('login.html')
+});
+
 app.post('/auth.json', function(req, res) {
 
   var body = req.body,

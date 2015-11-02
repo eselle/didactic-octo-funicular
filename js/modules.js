@@ -1,14 +1,19 @@
 CORE.create_module("search-box", function (sb) {
-    var searchInput, searchButton, resetButton;
+    var searchInput, 
+        searchButton, 
+        resetButton, 
+        logoutButton;
     
     return {
         init: function () {
             searchInput = sb.find("#search_input")[0];
             searchButton = sb.find("#search_button")[0];
             resetButton = sb.find("#quit_search")[0];
+            logoutButton = sb.find("#logout_button")[0];
             
             sb.addEvent(searchButton, "click", this.search);
             sb.addEvent(resetButton, "click", this.reset);
+            sb.addEvent(logoutButton, "click", this.logout);
         },
         destroy: function () {
             sb.removeEvent(searchButton, "click", this.search);
@@ -19,13 +24,13 @@ CORE.create_module("search-box", function (sb) {
             resetButton = null;
         },
         search: function () {
-            var query = searchInput.value;
+            var searchValue = searchInput.value;
             
-            if (query) {
-                // this will trigger an event that the product-panel is listening to
+            if (searchValue) {
+                // this will trigger an event the product-panel is listening to
                 sb.notify({
                     type : 'perform-search',
-                    data : query
+                    data : searchValue
                 });
             }
         },
@@ -35,6 +40,11 @@ CORE.create_module("search-box", function (sb) {
             sb.notify({
                 type : 'quit-search'
             });
+        },
+        logout: function () {
+            delete sessionStorage.token;
+            
+            window.location.replace('/login');
         }
     };
 });
@@ -97,14 +107,13 @@ CORE.create_module("product-panel", function (sb) {
         getProducts: function () {
             var serverProducts;
             var that = this;
-            
-            sb.login('moravia', 'argentina', function(response) {
                 
-                sb.getData(function (response) {
-                    if(response.length) {
-                        that.createProducts(response);
-                    };
-                })
+            sb.getData(function (response, status) {
+                if(status === 'success') {
+                    that.createProducts(response);
+                } else {
+                    window.location.replace('/login.html');
+                };
             });
         },
         createProducts: function (productsResponse) {
@@ -162,12 +171,12 @@ CORE.create_module("product-panel", function (sb) {
     };
 });
 
-CORE.create_module("shopping-cart", function (sb) {
+CORE.create_module('shopping-cart', function (sb) {
     var cart;
     
     return {
         init: function () {
-            cart = sb.find("#shopping-list")[0];
+            cart = sb.find('#shopping-list')[0];
             
             sb.listen({
                 'add-to-cart': this.addProduct
@@ -184,7 +193,7 @@ CORE.create_module("shopping-cart", function (sb) {
         addProduct : function (product) { 
             var cartItem = sb.find('#cart-item' + product.id)[0]; 
             if (!cartItem) { 
-                cartItem = sb.create_element('li', { id : "cart-item" + product.id, children : [ 
+                cartItem = sb.create_element('li', { id : 'cart-item' + product.id, children : [ 
                         sb.create_element('span', { 'class' : 'product_name', text : product.name }), 
                         ]}); 
 
