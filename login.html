@@ -6,15 +6,16 @@
     <link rel="stylesheet" href="default.css" />
 </head>
 <body>
-    <div id="main">
+   <div id="main">
         <div id="login">
-            <label for="username">Username</label>
-        	<input id="username" type="text" />
-            <label for="password">Password</label>
-        	<input id="password" type="password" />
-        	<button id="login_button">Login</button>
+            <h1>Login</h1>
+            <form id="login_form">
+                <input id="username" type="text" placeholder="Username" />
+                <input id="password" type="password" placeholder="Password"/>
+                <input type="submit" value="Login">
+                <span class="message-alert"></span>
+            </form>
         </div>
-
         <script src="js/jquery.js"></script>
         <script src="js/core-jquery.js"></script>        
         <script src="js/sandbox.js"></script>

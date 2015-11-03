@@ -1,13 +1,14 @@
 CORE.create_module("login", function (sb) {
-    var userInput, passwordInput, loginButton;
+    var userInput, passwordInput, loginForm, messageAlert;
     
     return {
         init: function () {
             userInput = sb.find("#username")[0];
             passwordInput = sb.find("#password")[0];
-            loginButton = sb.find("#login_button")[0];
+            loginForm = sb.find("#login_form")[0];
+            messageAlert = sb.find(".message-alert")[0];
             
-            sb.addEvent(loginButton, "click", this.login);
+            sb.addEvent(loginForm, "submit", this.login);
         },
         destroy: function () {
             sb.removeEvent(loginButton, "click", this.login);
@@ -16,17 +17,18 @@ CORE.create_module("login", function (sb) {
             passwordInput = null;
             loginButton = null;
         },
-        login: function () {
+        login: function (e) {
             var username = userInput.value;
             var password = passwordInput.value;
             
+            e.preventDefault();
             sb.login(username, password, function (response, status) {
-                console.log(response);
                 if(response.success === true) {
-                    //change to href
-                    window.location.replace('/');
+                    window.location.href='/';
                 } else {
-
+                    if(response.message) {
+                        messageAlert.innerHTML = response.message;
+                    };
                 };
             });
         }
